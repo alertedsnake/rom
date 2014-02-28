@@ -119,8 +119,11 @@ class Column(object):
             self._keygen = keygen if keygen else _string_keygen
 
     def _from_redis(self, value):
-        convert = self._allowed[0] if isinstance(self._allowed, (tuple, list)) else self._allowed
-        return convert(value)
+        convert = self._allowed[0] if (isinstance(self._allowed, (tuple, list)) and self._allowed) else self._allowed
+        if callable(convert):
+            return convert(value)
+        else:
+            return value
 
     def _to_redis(self, value):
         if value >= (1<<63):
